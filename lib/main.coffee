@@ -18,7 +18,7 @@ module.exports = class AHttpServerRouter
 
       args.unshift url
 
-      args.push route.route.bind(app)
+      args.push route.route.bind(server)
 
       app[route.method].apply app, args
 
