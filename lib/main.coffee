@@ -1,3 +1,5 @@
+{ isArray } = Array
+
 { Router } = require 'express'
 
 module.exports = class AHttpServerRouter
@@ -13,6 +15,18 @@ module.exports = class AHttpServerRouter
     Object.keys(r).map (url) ->
 
       route = r[url]
+
+      if isArray(route)
+
+        return route.map (routeMethod) ->
+
+          args = routeMethod.params || []
+
+          args.unshift url
+
+          args.push routeMethod.route.bind(server)
+
+          app[routeMethod.method].apply app, args
 
       args = route.params || []
 
