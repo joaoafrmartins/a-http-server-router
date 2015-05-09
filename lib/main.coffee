@@ -16,7 +16,9 @@ module.exports = class AHttpServerRouter
 
     if @config
 
-      url = require(@config).router.url
+      config = require(@config)
+
+      url = config.router.url
 
       configFn @server.config, @config
 
@@ -24,7 +26,7 @@ module.exports = class AHttpServerRouter
 
       if not (route in blacklist)
 
-        if route.match(/^\/\w(\/\w)*/)
+        if route.match(/^\/:?\w(\/:?\w)*/)
 
           args = definition.params || []
 
@@ -34,6 +36,6 @@ module.exports = class AHttpServerRouter
 
           @app[definition.method].apply @app, args
 
-        else throw new Error "invalid route: #{key}"
+        else throw new Error "invalid route: #{route}"
 
     return @app
