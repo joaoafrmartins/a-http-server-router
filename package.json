@@ -10,6 +10,7 @@
     "router"
   ],
   "dependencies": {
+    "a-http-server-config-fn": "",
     "express": ""
   },
   "devDependencies": {},

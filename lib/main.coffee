@@ -2,7 +2,7 @@
 
 { Router } = require 'express'
 
-Mixto = require 'mixto'
+configFn = require 'a-http-server-config-fn'
 
 module.exports = class AHttpServerRouter
 
@@ -10,7 +10,9 @@ module.exports = class AHttpServerRouter
 
     Object.defineProperty @, "app", value: Router()
 
-    blacklist = [ "server", "constructor" ]
+    blacklist = [ "server", "constructor", "config" ]
+
+    configFn @server.config, @config
 
     for route, definition of @
 
