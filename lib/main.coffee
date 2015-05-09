@@ -2,38 +2,30 @@
 
 { Router } = require 'express'
 
+Mixto = require 'mixto'
+
 module.exports = class AHttpServerRouter
 
-  constructor: (options) ->
+  constructor: (@server) ->
 
-    app = Router()
+    Object.defineProperty @, "app", value: Router()
 
-    { routes, config, server } = options
+    blacklist = [ "server", "constructor" ]
 
-    r = routes(config)
+    for route, definition of @
 
-    Object.keys(r).map (url) ->
+      if not (route in blacklist)
 
-      route = r[url]
+        if route.match(/^\/\w(\/\w)*/)
 
-      if isArray(route)
+          args = definition.params || []
 
-        return route.map (routeMethod) ->
+          args.unshift route
 
-          args = routeMethod.params || []
+          args.push definition.route.bind(@server)
 
-          args.unshift url
+          @app[definition.method].apply @app, args
 
-          args.push routeMethod.route.bind(server)
+        else throw new Error "invalid route: #{key}"
 
-          app[routeMethod.method].apply app, args
-
-      args = route.params || []
-
-      args.unshift url
-
-      args.push route.route.bind(server)
-
-      app[route.method].apply app, args
-
-    return app
+    return @app
