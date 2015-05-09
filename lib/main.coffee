@@ -10,9 +10,15 @@ module.exports = class AHttpServerRouter
 
     Object.defineProperty @, "app", value: Router()
 
+    url = ""
+
     blacklist = [ "server", "constructor", "config" ]
 
-    configFn @server.config, @config
+    if @config
+
+      url = require(@config).router.url
+
+      configFn @server.config, @config
 
     for route, definition of @
 
@@ -22,7 +28,7 @@ module.exports = class AHttpServerRouter
 
           args = definition.params || []
 
-          args.unshift route
+          args.unshift "#{url}#{route}"
 
           args.push definition.route.bind(@server)
 
