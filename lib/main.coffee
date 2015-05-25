@@ -8,34 +8,30 @@ module.exports = class AHttpServerRouter
 
   constructor: (@server) ->
 
-    Object.defineProperty @, "app", value: Router()
-
     url = ""
 
-    blacklist = [ "server", "constructor", "config" ]
+    Object.defineProperty @, "app", value: Router()
 
     if @config
 
       config = require(@config)
 
-      url = config.router.url
-
       configFn @server.config, @config
+
+      @config = config
+
+      url = @config.prefix or ""
 
     for route, definition of @
 
-      if not (route in blacklist)
+      if route.match(/^\/:?\w(\/:?\w)*/)
 
-        if route.match(/^\/:?\w(\/:?\w)*/)
+        args = definition.params || []
 
-          args = definition.params || []
+        args.unshift "#{url}#{route}"
 
-          args.unshift "#{url}#{route}"
+        args.push definition.route.bind(@server)
 
-          args.push definition.route.bind(@server)
-
-          @app[definition.method].apply @app, args
-
-        else throw new Error "invalid route: #{route}"
+        @app[definition.method].apply @app, args
 
     return @app
